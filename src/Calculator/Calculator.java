@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import net.miginfocom.swing.MigLayout;
+import java.awt.Color;
 
 public class Calculator extends JFrame {
 
@@ -25,6 +26,17 @@ public class Calculator extends JFrame {
 	double EnterNum2;
 	double Result;
 	String Operate;
+	
+	private final java.text.DecimalFormat df =
+		    new java.text.DecimalFormat("0.##########",
+		        java.text.DecimalFormatSymbols.getInstance(java.util.Locale.US));
+	private void displayResult(double r) {
+	    if (Double.isFinite(r) && r == Math.rint(r)) {
+	        jtxtDisplay.setText(String.valueOf((long) r)); // numero entero
+	    } else {
+	        jtxtDisplay.setText(df.format(r)); 
+	    }
+	}
 
 	/**
 	 * Launch the application.
@@ -49,14 +61,28 @@ public class Calculator extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 500);
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(240, 255, 240));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		
 		jtxtDisplay = new JTextField();
+		jtxtDisplay.setBackground(new Color(255, 250, 250));
 		jtxtDisplay.setFont(new Font("Tahoma", Font.BOLD, 24));
 		jtxtDisplay.setHorizontalAlignment(SwingConstants.RIGHT);
 		jtxtDisplay.setColumns(10);
+		//jtxtDisplay.setEditable(false); // prohibición - teclado en pantalla
+		//da permiso a teclado, exapto letras
+		/*jtxtDisplay.addKeyListener(new java.awt.event.KeyAdapter() {
+		    @Override
+		    public void keyTyped(java.awt.event.KeyEvent e) {
+		        char c = e.getKeyChar();
+		        if (!Character.isDigit(c) && c != '.') {
+		            e.consume(); 
+		        }
+		    }
+		});*/
+		
 		
 		JButton btnNewButton = new JButton("+/-");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -74,12 +100,12 @@ public class Calculator extends JFrame {
 		btnCE.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				jtxtDisplay.setText("");
-				String Fn, Sn;
+				//String Fn, Sn;
 				
-				Fn = String.valueOf(EnterNum1);
-				Sn = String.valueOf(EnterNum2);
-				Fn = "";
-				Sn = "";
+				//Fn = String.valueOf(EnterNum1);
+				//Sn = String.valueOf(EnterNum2);
+				//Fn = "";
+				//Sn = "";
 
 				
 			}
@@ -89,6 +115,11 @@ public class Calculator extends JFrame {
 		JButton btnC = new JButton("C");
 		btnC.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				jtxtDisplay.setText("");
+				EnterNum1 = 0;
+				EnterNum2 = 0;
+				Result = 0;
+				Operate = null;
 			}
 		});
 		btnC.setFont(new Font("Tahoma", Font.BOLD, 24));
@@ -138,10 +169,11 @@ public class Calculator extends JFrame {
 		btn9.setFont(new Font("Tahoma", Font.BOLD, 24));
 		
 		JButton btnNewButton_4 = new JButton("+");
+		
 		btnNewButton_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				EnterNum1 = Double.parseDouble(jtxtDisplay.getText());
+				EnterNum1 = Double.parseDouble(jtxtDisplay.getText().isEmpty() ?"0": jtxtDisplay.getText());
 				jtxtDisplay.setText(null);
 				Operate = "+";
 			}
@@ -178,7 +210,7 @@ public class Calculator extends JFrame {
 		JButton btnNewButton_5 = new JButton("-");
 		btnNewButton_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				EnterNum1 = Double.parseDouble(jtxtDisplay.getText());
+				EnterNum1 = Double.parseDouble(jtxtDisplay.getText().isEmpty() ?"0": jtxtDisplay.getText());
 				jtxtDisplay.setText(null);
 				Operate = "-";
 			}
@@ -215,7 +247,7 @@ public class Calculator extends JFrame {
 		JButton btnNewButton_6 = new JButton("*");
 		btnNewButton_6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				EnterNum1 = Double.parseDouble(jtxtDisplay.getText());
+				EnterNum1 = Double.parseDouble(jtxtDisplay.getText().isEmpty() ?"0": jtxtDisplay.getText());
 				jtxtDisplay.setText(null);
 				Operate = "*";
 			}
@@ -245,33 +277,44 @@ public class Calculator extends JFrame {
 		JButton btnNewButton_2_4 = new JButton("=");
 		btnNewButton_2_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (Operate == null || jtxtDisplay.getText().isEmpty()) return;
+
 				
 			EnterNum2 = Double.parseDouble(jtxtDisplay.getText());
-			if (Operate == "+") {
+			
+			if ("+".equals(Operate)) {
 				Result = EnterNum1 + EnterNum2;
-				jtxtDisplay.setText(String.valueOf(Result));
+				displayResult(Result);
 			}
-			else if (Operate == "-") {
+			else if ("-".equals(Operate)) {
 				Result = EnterNum1 - EnterNum2;
-				jtxtDisplay.setText(String.valueOf(Result));
+				displayResult(Result);
 			}
-			else if (Operate == "*") {
+			else if ("*".equals(Operate)) {
 				Result = EnterNum1 * EnterNum2;
-				jtxtDisplay.setText(String.valueOf(Result));
+				displayResult(Result);
 			}
-			else if (Operate == "/") {
-				Result = EnterNum1 / EnterNum2;
-				jtxtDisplay.setText(String.valueOf(Result));
+			else if ( "/".equals(Operate)) {
+				if(EnterNum2 == 0) {
+					jtxtDisplay.setText("Error");
+				}else {
+					Result = EnterNum1 / EnterNum2;
+					displayResult(Result);
+				}
+				
+			}
+			Operate = null;   
+			EnterNum1 = Result; 
+
 			}
 			
-			}
 		});
 		btnNewButton_2_4.setFont(new Font("Tahoma", Font.BOLD, 24));
 		
 		JButton btnNewButton_7 = new JButton("/");
 		btnNewButton_7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				EnterNum1 = Double.parseDouble(jtxtDisplay.getText());
+				EnterNum1 = Double.parseDouble(jtxtDisplay.getText().isEmpty() ?"0": jtxtDisplay.getText());
 				jtxtDisplay.setText(null);
 				Operate = "/";
 			}
@@ -299,5 +342,44 @@ public class Calculator extends JFrame {
 		contentPane.add(btnNewButton_1_4, "cell 2 5,grow");
 		contentPane.add(btnNewButton_2_4, "cell 4 5,grow");
 		contentPane.add(btnNewButton_7, "cell 6 5,grow");
+		getRootPane().setDefaultButton(btnNewButton_2_4);
+		
+		jtxtDisplay.addActionListener(e -> btnNewButton_2_4.doClick());
+
+		
+		jtxtDisplay.addKeyListener(new java.awt.event.KeyAdapter() {
+		  @Override public void keyTyped(java.awt.event.KeyEvent e) {
+		    char c = e.getKeyChar();
+		    if (Character.isDigit(c)) { jtxtDisplay.setText(jtxtDisplay.getText()+c); e.consume(); return; }
+		    if (c=='.' && !jtxtDisplay.getText().contains(".")) { jtxtDisplay.setText(jtxtDisplay.getText()+'.'); e.consume(); return; }
+
+		    switch (c) {
+		    case '+': btnNewButton_4.doClick(); e.consume(); return;
+		    case '-': btnNewButton_5.doClick(); e.consume(); return;
+		    case '*': btnNewButton_6.doClick(); e.consume(); return;
+		    case '/': btnNewButton_7.doClick(); e.consume(); return;
+		  }
+
+		    if (c=='\n') {                               
+		      btnNewButton_2_4.doClick();
+		      e.consume(); return;
+		    }
+		    e.consume(); 
+		    
+		  }
+		  @Override
+		  public void keyPressed(java.awt.event.KeyEvent e) {
+		      if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+		          btnNewButton_2_4.doClick();  //press "="
+		          e.consume();
+		      }
+		  }
+
+		});
+		
+		
+
 	}
+	
+	
 }
